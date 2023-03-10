@@ -163,7 +163,7 @@ func DbDeleteMessageLeID(sessionId string, maxId int) (err error) {
 }
 
 func DbFindLarkEvent(appId, eventId string) (event *model.LarkEvent, err error) {
-	err = config.DB.Where(&model.LarkEvent{AppId: appId, EventId: eventId}).Limit(1).Find(&event).Error
+	err = config.DB.Where(&model.LarkEvent{AppId: appId, EventId: eventId}).First(&event).Error
 	return
 }
 

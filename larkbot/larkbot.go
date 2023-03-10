@@ -45,14 +45,13 @@ func init() {
 func (b *LarkBot) handleOnP2MessageReceiveV1(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
 	eventId := event.EventV2Base.Header.EventID
 	if eventId != "" {
-		larkEvent, _ := service.DbFindLarkEvent(b.AppId, eventId)
-		if larkEvent != nil {
-			log.Println("[lark] repeat LarkEvent")
+		larkEvent, err := service.DbFindLarkEvent(b.AppId, eventId)
+		if larkEvent != nil && larkEvent.ID > 0 {
+			log.Println("[lark] repeat LarkEvent", err)
 			return nil
 		}
 	}
-	err := b.doP2MessageReceiveV1(event)
-	return err
+	return b.doP2MessageReceiveV1(event)
 }
 
 func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err error) {
