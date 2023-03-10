@@ -37,6 +37,6 @@ type LarkEvent struct {
 }
 
 func InitDB() (err error) {
-	err = config.DB.AutoMigrate(&Message{})
+	err = config.DB.AutoMigrate(&Message{}, &HistoryMessage{}, &LarkEvent{})
 	return
 }
