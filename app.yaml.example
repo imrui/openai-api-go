@@ -9,3 +9,18 @@ scene-delete-texts:
 client-id-keys:
   test001: test001clientidkey
   test002: test002clientidkey
+lark-bots:
+  - url-path: path1
+    app-id: AppId1
+    app-name: AppName1
+    app-secret: AppSecret1
+    verification-token: verification-token1
+    encrypt-key: encrypt-key
+    lark-host: https://open.feishu.cn
+  - url-path: path1
+    app-id: AppId2
+    app-name: AppName2
+    app-secret: AppSecret2
+    verification-token: verification-token2
+    encrypt-key: encrypt-key
+    lark-host: https://open.feishu.cn

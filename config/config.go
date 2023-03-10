@@ -12,6 +12,16 @@ var (
 	DB  *gorm.DB
 )
 
+type LarkConfig struct {
+	UrlPath           string `mapstructure:"url-path"`
+	AppId             string `mapstructure:"app-id"`
+	AppName           string `mapstructure:"app-name"`
+	AppSecret         string `mapstructure:"app-secret"`
+	VerificationToken string `mapstructure:"verification-token"`
+	EncryptKey        string `mapstructure:"encrypt-key"`
+	LarkHost          string `mapstructure:"lark-host"`
+}
+
 type Config struct {
 	ServerAddr       string            `mapstructure:"server-addr"`
 	OpenAiApiKey     string            `mapstructure:"openai-api-key"`
@@ -21,6 +31,7 @@ type Config struct {
 	ApiSignEnable    bool              `mapstructure:"api-sign-enable"`
 	Scenes           []string          `mapstructure:"scenes"`
 	SceneDeleteTexts map[string]string `mapstructure:"scene-delete-texts"`
+	LarkConfigs      []LarkConfig      `mapstructure:"lark-bots"`
 }
 
 func (c *Config) GetClientKey(id string) (key string, ok bool) {
