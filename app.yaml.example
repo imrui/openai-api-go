@@ -2,6 +2,7 @@ server-addr: :8000
 openai-api-key: YourOpenAIApiKey
 openai-model: gpt-3.5-turbo
 openai-max-token: 2048
+openai-temperature: 0.7
 api-sign-enable: true
 scenes: [lark, tg, wx, qq, web]
 scene-delete-texts:

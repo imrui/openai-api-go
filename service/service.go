@@ -54,8 +54,9 @@ func Talk(senderId, chatId, question, scene string) (answer string, err error) {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:    config.Cfg.OpenAiModel,
-			Messages: messages,
+			Model:       config.Cfg.OpenAiModel,
+			Messages:    messages,
+			Temperature: config.Cfg.OpenAiTemperature,
 		},
 	)
 	if err != nil {

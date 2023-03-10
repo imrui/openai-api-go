@@ -23,15 +23,16 @@ type LarkConfig struct {
 }
 
 type Config struct {
-	ServerAddr       string            `mapstructure:"server-addr"`
-	OpenAiApiKey     string            `mapstructure:"openai-api-key"`
-	OpenAiModel      string            `mapstructure:"openai-model"`
-	OpenAiMaxToken   int               `mapstructure:"openai-max-token"`
-	ClientIdKeys     map[string]string `mapstructure:"client-id-keys"`
-	ApiSignEnable    bool              `mapstructure:"api-sign-enable"`
-	Scenes           []string          `mapstructure:"scenes"`
-	SceneDeleteTexts map[string]string `mapstructure:"scene-delete-texts"`
-	LarkConfigs      []LarkConfig      `mapstructure:"lark-bots"`
+	ServerAddr        string            `mapstructure:"server-addr"`
+	OpenAiApiKey      string            `mapstructure:"openai-api-key"`
+	OpenAiModel       string            `mapstructure:"openai-model"`
+	OpenAiMaxToken    int               `mapstructure:"openai-max-token"`
+	OpenAiTemperature float32           `mapstructure:"openai-temperature"`
+	ClientIdKeys      map[string]string `mapstructure:"client-id-keys"`
+	ApiSignEnable     bool              `mapstructure:"api-sign-enable"`
+	Scenes            []string          `mapstructure:"scenes"`
+	SceneDeleteTexts  map[string]string `mapstructure:"scene-delete-texts"`
+	LarkConfigs       []LarkConfig      `mapstructure:"lark-bots"`
 }
 
 func (c *Config) GetClientKey(id string) (key string, ok bool) {
