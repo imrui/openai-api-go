@@ -24,6 +24,18 @@ type Message struct {
 	TotalTokens      int    `json:"totalTokens"`
 }
 
+type HistoryMessage struct {
+	Message
+}
+
+type LarkEvent struct {
+	Model
+	AppId    string `json:"appId" gorm:"index"`
+	EventId  string `json:"eventId" gorm:"index"`
+	Question string `json:"question"`
+	Answer   string `json:"answer"`
+}
+
 func InitDB() (err error) {
 	err = config.DB.AutoMigrate(&Message{})
 	return

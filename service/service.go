@@ -65,18 +65,21 @@ func Talk(senderId, chatId, question, scene string) (answer string, err error) {
 	}
 	answer = strings.TrimSpace(resp.Choices[0].Message.Content)
 	log.Println("[chat] answer:", answer)
-	m := &model.Message{
-		SessionId:        sessionId,
-		Scene:            scene,
-		SenderId:         senderId,
-		ChatId:           chatId,
-		Question:         question,
-		Answer:           answer,
-		PromptTokens:     resp.Usage.PromptTokens,
-		CompletionTokens: resp.Usage.CompletionTokens,
-		TotalTokens:      resp.Usage.TotalTokens,
-	}
-	err = DbAddMessage(m)
+	// 异步保存对话信息
+	go func() {
+		m := &model.Message{
+			SessionId:        sessionId,
+			Scene:            scene,
+			SenderId:         senderId,
+			ChatId:           chatId,
+			Question:         question,
+			Answer:           answer,
+			PromptTokens:     resp.Usage.PromptTokens,
+			CompletionTokens: resp.Usage.CompletionTokens,
+			TotalTokens:      resp.Usage.TotalTokens,
+		}
+		_ = DbAddMessage(m)
+	}()
 	return
 }
 
@@ -133,6 +136,14 @@ func DbFindAllMessages(sessionId string) (messages []*model.Message, err error) 
 
 func DbAddMessage(message *model.Message) (err error) {
 	err = config.DB.Create(&message).Error
+	if err != nil {
+		return
+	}
+	// 同时保存历史记录
+	hm := &model.HistoryMessage{
+		Message: *message,
+	}
+	config.DB.Create(&hm)
 	return
 }
 
@@ -148,5 +159,15 @@ func DbDeleteMessageBySessionId(sessionId string) (err error) {
 
 func DbDeleteMessageLeID(sessionId string, maxId int) (err error) {
 	err = config.DB.Delete(&model.Message{SessionId: sessionId}, "id <= ?", maxId).Error
+	return
+}
+
+func DbFindLarkEvent(appId, eventId string) (event *model.LarkEvent, err error) {
+	err = config.DB.Where(&model.LarkEvent{AppId: appId, EventId: eventId}).Limit(1).Find(&event).Error
+	return
+}
+
+func DbAddLarkEvent(event *model.LarkEvent) (err error) {
+	err = config.DB.Save(&event).Error
 	return
 }
