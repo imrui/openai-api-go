@@ -48,7 +48,7 @@ func (b *LarkBot) handleOnP2MessageReceiveV1(ctx context.Context, event *larkim.
 		_, _ = b.Send(openId, "消息识别异常，快去请瑞神！")
 		return err
 	}
-	answer, err := service.Talk(openId, chatId, content, "lark")
+	answer, err := service.Talk(openId, chatId, text.Text, "lark")
 	if err != nil {
 		_, _ = b.Send(openId, "我emo了，快去请瑞神！")
 		return err
