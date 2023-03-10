@@ -51,22 +51,6 @@ func Talk(senderId, chatId, question, scene string) (answer string, err error) {
 	}
 	body, err := json.Marshal(messages)
 	log.Println("talk message: ", string(body))
-	//if !config.Cfg.ApiSignEnable {
-	//	answer = question
-	//	m := &model.Message{
-	//		SessionId:        sessionId,
-	//		Scene:            scene,
-	//		SenderId:         senderId,
-	//		ChatId:           chatId,
-	//		Question:         question,
-	//		Answer:           answer,
-	//		PromptTokens:     len(question),
-	//		CompletionTokens: len(answer),
-	//		TotalTokens:      len(question) + len(answer),
-	//	}
-	//	err = DbAddMessage(m)
-	//	return
-	//}
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -165,32 +149,3 @@ func DbDeleteMessageLeID(sessionId string, maxId int) (err error) {
 	err = config.DB.Delete(&model.Message{SessionId: sessionId}, "id <= ?", maxId).Error
 	return
 }
-
-//func TestChat(c *gin.Context) {
-//	message := "世界首富是谁"
-//	reply := sendMessage(message)
-//	c.JSON(http.StatusOK, gin.H{"content": reply})
-//}
-//
-//func sendMessage(message string) (reply string) {
-//	resp, err := client.CreateChatCompletion(
-//		context.Background(),
-//		openai.ChatCompletionRequest{
-//			Model: openai.GPT3Dot5Turbo,
-//			Messages: []openai.ChatCompletionMessage{
-//				{
-//					Role:    openai.ChatMessageRoleUser,
-//					Content: message,
-//				},
-//			},
-//		},
-//	)
-//
-//	if err != nil {
-//		fmt.Println("err", err)
-//		return
-//	}
-//	reply = resp.Choices[0].Message.Content
-//	fmt.Println(reply)
-//	return
-//}
