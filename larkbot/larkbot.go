@@ -123,12 +123,18 @@ func (b *LarkBot) talkOpenAI(eventId, openId, chatId, question string) (answer s
 }
 
 func (b *LarkBot) ReplyMsg(messageId, text string) (err error) {
-	content := larkim.NewTextMsgBuilder().Text(text).Build()
+	content := &ContentText{
+		Text: text,
+	}
+	data, err := json.Marshal(content)
+	if err != nil {
+		return
+	}
 	req := larkim.NewReplyMessageReqBuilder().
 		MessageId(messageId).
 		Body(larkim.NewReplyMessageReqBodyBuilder().
 			MsgType(larkim.MsgTypeText).
-			Content(content).
+			Content(string(data)).
 			Build()).
 		Build()
 	res, err := b.Cli.Im.Message.Reply(context.Background(), req)
@@ -142,13 +148,19 @@ func (b *LarkBot) ReplyMsg(messageId, text string) (err error) {
 }
 
 func (b *LarkBot) SendMsg(openId, text string) (err error) {
-	content := larkim.NewTextMsgBuilder().Text(text).Build()
+	content := &ContentText{
+		Text: text,
+	}
+	data, err := json.Marshal(content)
+	if err != nil {
+		return
+	}
 	req := larkim.NewCreateMessageReqBuilder().
 		ReceiveIdType(larkim.ReceiveIdTypeOpenId).
 		Body(larkim.NewCreateMessageReqBodyBuilder().
 			MsgType(larkim.MsgTypeText).
 			ReceiveId(openId).
-			Content(content).
+			Content(string(data)).
 			Build()).
 		Build()
 	res, err := b.Cli.Im.Message.Create(context.Background(), req)
