@@ -35,13 +35,15 @@ func CommandProcess(question string, sessionId string) (bool, string) {
 
 func Talk(senderId, chatId, question, scene string) (answer string, err error) {
 	sessionId := util.MakeSessionId(scene, senderId, chatId)
+	// 先删除相关文本
+	if text, ok := config.Cfg.GetSceneDeleteText(scene); ok {
+		question = strings.ReplaceAll(question, text, "")
+	}
+	// 再去除空白字符，解析指令
 	question = strings.TrimSpace(question)
 	if stop, stopMsg := CommandProcess(question, sessionId); stop {
 		answer = stopMsg
 		return
-	}
-	if text, ok := config.Cfg.GetSceneDeleteText(scene); ok {
-		question = strings.ReplaceAll(question, text, "")
 	}
 	log.Println("[chat] question:", question)
 	messages, err := BuildTalkMessages(sessionId, question)

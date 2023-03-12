@@ -6,7 +6,7 @@ openai-temperature: 0.7
 api-sign-enable: true
 scenes: [lark, tg, wx, qq, web]
 scene-delete-texts:
-  lark: _user_1
+  lark: '@_user_1'
 client-id-keys:
   test001: test001clientidkey
   test002: test002clientidkey

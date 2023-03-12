@@ -55,29 +55,31 @@ func (b *LarkBot) handleOnP2MessageReceiveV1(ctx context.Context, event *larkim.
 }
 
 func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err error) {
-	openId := *event.Event.Sender.SenderId.OpenId
+	msgId := *event.Event.Message.MessageId
 	messageType := *event.Event.Message.MessageType
 	if messageType != larkim.MsgTypeText {
-		_ = b.Send(openId, "我还不会其他类型的提问，快去找瑞神给我升级！")
+		_ = b.ReplyMsg(msgId, "我还不会其他类型的提问，快去找瑞神给我升级！")
 		return
 	}
 	content := *event.Event.Message.Content
 	var text ContentText
 	err = json.Unmarshal([]byte(content), &text)
 	if err != nil {
-		_ = b.Send(openId, "消息识别异常，快去请瑞神！")
+		_ = b.ReplyMsg(msgId, "消息识别异常，快去请瑞神！")
 		return
 	}
+	question := text.Text
 	eventId := event.EventV2Base.Header.EventID
+	openId := *event.Event.Sender.SenderId.OpenId
 	chatId := *event.Event.Message.ChatId
 	chatType := *event.Event.Message.ChatType
 	// 私聊消息，直接回复
 	if chatType == "p2p" {
-		answer, err1 := b.talkOpenAI(eventId, openId, chatId, text.Text)
+		answer, err1 := b.talkOpenAI(eventId, openId, chatId, question)
 		if err1 != nil {
 			answer = "我emo了，快去请瑞神！"
 		}
-		_ = b.Send(openId, answer)
+		_ = b.ReplyMsg(msgId, answer)
 		return
 	}
 	// 群聊消息，需要@机器人
@@ -93,11 +95,11 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 			log.Println("[lark] chat_type group: mention[0] not bot.")
 			return
 		}
-		answer, err2 := b.talkOpenAI(eventId, openId, chatId, text.Text)
+		answer, err2 := b.talkOpenAI(eventId, openId, chatId, question)
 		if err2 != nil {
 			answer = "我好像故障了，你们继续聊，我先休息一会！"
 		}
-		_ = b.Send(openId, answer)
+		_ = b.ReplyMsg(msgId, answer)
 	}
 	return
 }
@@ -120,21 +122,41 @@ func (b *LarkBot) talkOpenAI(eventId, openId, chatId, question string) (answer s
 	return
 }
 
-func (b *LarkBot) Send(openId string, text string) (err error) {
-	content := &ContentText{
-		Text: text,
-	}
-	data, err := json.Marshal(content)
+func (b *LarkBot) ReplyMsg(messageId, text string) (err error) {
+	content := larkim.NewTextMsgBuilder().Text(text).Build()
+	req := larkim.NewReplyMessageReqBuilder().
+		MessageId(messageId).
+		Body(larkim.NewReplyMessageReqBodyBuilder().
+			MsgType(larkim.MsgTypeText).
+			Content(content).
+			Build()).
+		Build()
+	res, err := b.Cli.Im.Message.Reply(context.Background(), req)
 	if err != nil {
 		return
 	}
-	_, err = b.Cli.Im.Message.Create(context.Background(), larkim.NewCreateMessageReqBuilder().
+	if !res.Success() {
+		log.Println("[lark] reply msg err:", err)
+	}
+	return
+}
+
+func (b *LarkBot) SendMsg(openId, text string) (err error) {
+	content := larkim.NewTextMsgBuilder().Text(text).Build()
+	req := larkim.NewCreateMessageReqBuilder().
 		ReceiveIdType(larkim.ReceiveIdTypeOpenId).
 		Body(larkim.NewCreateMessageReqBodyBuilder().
 			MsgType(larkim.MsgTypeText).
 			ReceiveId(openId).
-			Content(string(data)).
+			Content(content).
 			Build()).
-		Build())
+		Build()
+	res, err := b.Cli.Im.Message.Create(context.Background(), req)
+	if err != nil {
+		return
+	}
+	if !res.Success() {
+		log.Println("[lark] send msg err:", err)
+	}
 	return
 }
