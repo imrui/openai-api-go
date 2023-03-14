@@ -56,11 +56,6 @@ func (b *LarkBot) handleOnP2MessageReceiveV1(ctx context.Context, event *larkim.
 
 func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err error) {
 	msgId := *event.Event.Message.MessageId
-	messageType := *event.Event.Message.MessageType
-	if messageType != larkim.MsgTypeText {
-		_ = b.ReplyMsg(msgId, "我还不会其他类型的提问，快去找瑞神给我升级！")
-		return
-	}
 	content := *event.Event.Message.Content
 	var text ContentText
 	err = json.Unmarshal([]byte(content), &text)
@@ -75,6 +70,12 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 	chatType := *event.Event.Message.ChatType
 	// 私聊消息，直接回复
 	if chatType == "p2p" {
+		// 非文本消息，不处理
+		messageType := *event.Event.Message.MessageType
+		if messageType != larkim.MsgTypeText {
+			_ = b.ReplyMsg(msgId, "我还不会其他类型的提问，快去找瑞神给我升级！")
+			return
+		}
 		answer, err1 := b.talkOpenAI(eventId, openId, chatId, question)
 		if err1 != nil {
 			answer = "我emo了，快去请瑞神！"
@@ -93,6 +94,12 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 		// 未提及机器人，则忽略
 		if *mentions[0].Name != b.AppName {
 			log.Println("[lark] chat_type group: mention[0] not bot.")
+			return
+		}
+		// 非文本消息，不处理
+		messageType := *event.Event.Message.MessageType
+		if messageType != larkim.MsgTypeText {
+			_ = b.ReplyMsg(msgId, "我还不会其他类型的提问，快去找瑞神给我升级！")
 			return
 		}
 		answer, err2 := b.talkOpenAI(eventId, openId, chatId, question)
