@@ -78,7 +78,7 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 		}
 		answer, err1 := b.talkOpenAI(eventId, openId, chatId, question)
 		if err1 != nil {
-			answer = "我emo了，快去请瑞神！"
+			answer = "我emo了，快去请瑞神！\n" + err1.Error()
 		}
 		_ = b.ReplyMsg(msgId, answer)
 		return
@@ -104,7 +104,7 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 		}
 		answer, err2 := b.talkOpenAI(eventId, openId, chatId, question)
 		if err2 != nil {
-			answer = "我好像故障了，你们继续聊，我先休息一会！"
+			answer = "我好像故障了，你们继续聊，我先休息一会！\n" + err2.Error()
 		}
 		_ = b.ReplyMsg(msgId, answer)
 	}
@@ -113,6 +113,9 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 
 func (b *LarkBot) talkOpenAI(eventId, openId, chatId, question string) (answer string, err error) {
 	answer, err = service.Talk(openId, chatId, question, "lark")
+	if err != nil {
+		return
+	}
 	if eventId == "" {
 		return
 	}
