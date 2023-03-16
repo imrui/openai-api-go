@@ -113,9 +113,6 @@ func (b *LarkBot) doP2MessageReceiveV1(event *larkim.P2MessageReceiveV1) (err er
 
 func (b *LarkBot) talkOpenAI(eventId, openId, chatId, question string) (answer string, err error) {
 	answer, err = service.Talk(openId, chatId, question, "lark")
-	if err != nil {
-		return
-	}
 	if eventId == "" {
 		return
 	}
