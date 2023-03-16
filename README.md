@@ -4,6 +4,16 @@
 
 提供通用HTTP服务，便于集成到其他系统之中，如：Telegram、Lark/飞书、企业微信等各种机器人场景。
 
+## Lark/飞书
+
+### POST `/bot/lark/webhook/event/xxx` 事件订阅
+
+1. 访问 `开发者后台` ，创建一个名为 `ChatGPT` 的应用，上传应用头像, 获取到 `AppID` 和 `AppSecret`
+2. 应用能力：给应用添加 `机器人` 能力
+3. 事件订阅：获取 `Encrypt Key` 和 `Verification Token` ；配置请求地址 `https://***/bot/lark/webhook/event/xxx` ；添加 `接收消息 v2.0` 事件，并开启相关权限。
+4. 开启 `以应用的身份发消息` 权限 `im:message:send_as_bot`
+5. 发布版本，联系管理员审核。
+
 ## HTTP API
 
 ### POST `/ai/chat/api/talk` 聊天对话
